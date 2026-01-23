@@ -129,8 +129,7 @@ namespace ReceiptTest.Controllers
             try
             {
                 var e = new EPSON();
-                //var printer = new FilePrinter(filePath: @"\\DESKTOP-F6LR2M9\QX3");
-                var printer = new FilePrinter(filePath: "LPT1");
+                var printer = new FilePrinter(filePath: "/dev/usb/lp0");
                 byte[] bytes = ByteSplicer.Combine(
                 e.Initialize(),
             e.CenterAlign(),
@@ -140,37 +139,10 @@ namespace ReceiptTest.Controllers
             e.PrintLine($"Time: {DateTime.Now:T}"),
             e.PrintLine("Connection: Shared USB Path"),
             e.FullCut()
+
         );
-
-        // 4. Send to printer
-        printer.Write(bytes);
-
-                //Printer printer = new Printer("QX3");
-
-                // printer.Write(
-                //     e.Initialize(),
-                //     e.CenterAlign(),
-                //     e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
-                //     e.PrintLine("BIRCH CP-Q3X"),
-                //     e.SetStyles(PrintStyle.None),
-                //     e.PrintLine("Test Print"),
-                //     e.PrintLine(""),
-                //     e.LeftAlign(),
-                //     e.PrintLine($"Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}"),
-                //     e.PrintLine("Printer: Online"),
-                //     e.PrintLine("Status: OK"),
-                //     e.PrintLine(""),
-                //     e.PrintLine(""),
-                //     e.FullCut()
-                // );
-                
-                // printer.TestPrinter();
-                // printer.Append("測試測試記憶卡不能用");
-                // printer.Append("記憶卡五百塊");
-                // printer.Append("testing page");
-                // printer.Separator();
-                // printer.FullPaperCut();
-                // printer.PrintDocument();
+        
+        await System.IO.File.WriteAllBytesAsync("/dev/usb/lp0", bytes);
 
                 return Ok(new { message = "Test print sent successfully" });
             }
