@@ -126,52 +126,61 @@ namespace ReceiptTest.Controllers
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
-
+                var encoding = System.Text.Encoding.GetEncoding("GB18030"); //chinese
+                Encoding gb18030 = Encoding.GetEncoding("GB18030");
                 var url = "https://www.google.com";
+
+                string imagePath = Path.Combine(AppContext.BaseDirectory, "images", "logo.png");
+                
+
                 var e = new EPSON();
- 
+
+                var chinese = "測試商品 \n";
+                var chinese2 = "測試商品\n";
                 byte[] bytes = ByteSplicer.Combine(
                 e.CenterAlign(),
-    //e.PrintImage(System.IO.File.ReadAllBytes("images/pd-logo-300.png"), true),
-        e.PrintQRCode(url, TwoDimensionCodeType.QRCODE_MODEL2, Size2DCode.LARGE, CorrectionLevel2DCode.PERCENT_30),
-    e.PrintLine(""),
-    e.SetBarcodeHeightInDots(360),
-    e.SetBarWidth(BarWidth.Default),
-    e.SetBarLabelPosition(BarLabelPrintPosition.None),
-    e.PrintBarcode(BarcodeType.ITF, "0123456789"),
-    e.PrintLine(""),
-    e.PrintLine("B&H PHOTO & VIDEO"),
-    e.PrintLine("420 NINTH AVE."),
-    e.PrintLine("NEW YORK, NY 10001"),
-    e.PrintLine("(212) 502-6380 - (800)947-9975"),
-    e.SetStyles(PrintStyle.Underline),
-    e.PrintLine("www.bhphotovideo.com"),
-    e.SetStyles(PrintStyle.None),
-    e.PrintLine(""),
-    e.LeftAlign(),
-    e.PrintLine("Order: 123456789        Date: 02/01/19"),
-    e.PrintLine(""),
-    e.PrintLine(""),
-    e.SetStyles(PrintStyle.FontB),
-    e.PrintLine("1   TRITON LOW-NOISE IN-LINE MICROPHONE PREAMP"),
-    e.PrintLine("    TRFETHEAD/FETHEAD                        89.95         89.95"),
-    e.PrintLine("----------------------------------------------------------------"),
-    e.RightAlign(),
-    e.PrintLine("SUBTOTAL         89.95"),
-    e.PrintLine("Total Order:         89.95"),
-    e.PrintLine("Total Payment:         89.95"),
-    e.PrintLine(""),
-    e.LeftAlign(),
-    e.SetStyles(PrintStyle.Bold | PrintStyle.FontB),
-    e.PrintLine("SOLD TO:                        SHIP TO:"),
-    e.SetStyles(PrintStyle.FontB),
-    e.PrintLine("  FIRSTN LASTNAME                 FIRSTN LASTNAME"),
-    e.PrintLine("  123 FAKE ST.                    123 FAKE ST."),
-    e.PrintLine("  DECATUR, IL 12345               DECATUR, IL 12345"),
-    e.PrintLine("  (123)456-7890                   (123)456-7890"),
-    e.PrintLine("  CUST: 87654321"),
-    e.PrintLine(""),
-    e.PrintLine("")
+                //e.PrintImage(System.IO.File.ReadAllBytes("images/logo.png"), isHiDPI: true, isLegacy: false),
+                //e.PrintImage(System.IO.File.ReadAllBytes("images/pd-logo-300.png"), true),
+                e.PrintQRCode(url, TwoDimensionCodeType.QRCODE_MODEL2, Size2DCode.LARGE, CorrectionLevel2DCode.PERCENT_30),
+                e.PrintLine(""),
+                e.SetBarcodeHeightInDots(360),
+                e.SetBarWidth(BarWidth.Default),
+                e.SetBarLabelPosition(BarLabelPrintPosition.None),
+                e.PrintBarcode(BarcodeType.ITF, "0123456789"),
+                e.PrintLine(""),
+                e.PrintLine("B&H PHOTO & VIDEO"),
+                e.PrintLine("420 NINTH AVE."),
+                e.PrintLine("NEW YORK, NY 10001"),
+                e.PrintLine("(212) 502-6380 - (800)947-9975"),
+                e.SetStyles(PrintStyle.Underline),
+                e.PrintLine("www.bhphotovideo.com"),
+                e.SetStyles(PrintStyle.None),
+                e.PrintLine(""),
+                e.LeftAlign(),
+                e.PrintLine("Order: 123456789        Date: 02/01/19"),
+                e.PrintLine(""),
+                e.PrintLine(""),
+                e.SetStyles(PrintStyle.FontB),
+                encoding.GetBytes(chinese),
+                e.PrintLine($"    {encoding.GetBytes(chinese2)}                        89.95         89.95"),
+                e.PrintLine("----------------------------------------------------------------"),
+                e.RightAlign(),
+                e.PrintLine("SUBTOTAL         89.95"),
+                e.PrintLine("Total Order:         89.95"),
+                e.PrintLine("Total Payment:         89.95"),
+                e.PrintLine(""),
+                e.LeftAlign(),
+                e.SetStyles(PrintStyle.Bold | PrintStyle.FontB),
+                e.PrintLine("SOLD TO:                        SHIP TO:"),
+                e.SetStyles(PrintStyle.FontB),
+                e.PrintLine("  FIRSTN LASTNAME                 FIRSTN LASTNAME"),
+                e.PrintLine("  123 FAKE ST.                    123 FAKE ST."),
+                e.PrintLine("  DECATUR, IL 12345               DECATUR, IL 12345"),
+                e.PrintLine("  (123)456-7890                   (123)456-7890"),
+                e.PrintLine("  CUST: 87654321"),
+                e.PrintLine(""),
+                e.PrintLine(""),
+                e.FullCut()
                 );
 
                 var tempFile = Path.GetTempFileName();

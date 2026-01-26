@@ -42,10 +42,6 @@ C:\Users\User\Desktop\ReceiptTest\obj\Release\net8.0\linux-arm64\refint\ReceiptT
 C:\Users\User\Desktop\ReceiptTest\obj\Release\net8.0\linux-arm64\ReceiptTest.pdb
 C:\Users\User\Desktop\ReceiptTest\obj\Release\net8.0\linux-arm64\ReceiptTest.genruntimeconfig.cache
 C:\Users\User\Desktop\ReceiptTest\obj\Release\net8.0\linux-arm64\ref\ReceiptTest.dll
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\appsettings.Development.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\appsettings.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\ReceiptTest.deps.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\obj\Release\net8.0\linux-arm64\ReceiptTest.sourcelink.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\Microsoft.CSharp.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\Microsoft.VisualBasic.Core.dll
@@ -367,6 +363,10 @@ C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\libhostfxr.so
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\libhostpolicy.so
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\libmscordaccore.so
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\libmscordbi.so
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\appsettings.Development.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\ReceiptTest.deps.json
@@ -383,7 +383,3 @@ C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\appsettings.Development.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\appsettings.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
