@@ -10,6 +10,7 @@ using System.Drawing.Printing;
 using ESC_POS_USB_NET.Printer;
 using System.Text;
 using ESCPOS_NET.Utilities;
+using System.Diagnostics;
 
 namespace ReceiptTest.Controllers
 {
@@ -21,10 +22,7 @@ namespace ReceiptTest.Controllers
         private readonly ILogger<PrintController> _logger;
         private readonly IConfiguration _configuration;
 
-        public PrintController(
-            IPrinterService printerService, 
-            ILogger<PrintController> logger,
-            IConfiguration configuration)
+        public PrintController(IPrinterService printerService, ILogger<PrintController> logger, IConfiguration configuration)
         {
             _printerService = printerService;
             _logger = logger;
@@ -128,23 +126,86 @@ namespace ReceiptTest.Controllers
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
+
+                var url = "https://www.google.com";
                 var e = new EPSON();
-                var printer = new FilePrinter(filePath: "/dev/usb/lp0");
+ 
                 byte[] bytes = ByteSplicer.Combine(
-                e.Initialize(),
-            e.CenterAlign(),
-            e.PrintLine("BIRCH QX3 - USB MODE"),
-            e.PrintLine("------------------------"),
-            e.LeftAlign(),
-            e.PrintLine($"Time: {DateTime.Now:T}"),
-            e.PrintLine("Connection: Shared USB Path"),
-            e.FullCut()
+                e.CenterAlign(),
+    //e.PrintImage(System.IO.File.ReadAllBytes("images/pd-logo-300.png"), true),
+        e.PrintQRCode(url, TwoDimensionCodeType.QRCODE_MODEL2, Size2DCode.LARGE, CorrectionLevel2DCode.PERCENT_30),
+    e.PrintLine(""),
+    e.SetBarcodeHeightInDots(360),
+    e.SetBarWidth(BarWidth.Default),
+    e.SetBarLabelPosition(BarLabelPrintPosition.None),
+    e.PrintBarcode(BarcodeType.ITF, "0123456789"),
+    e.PrintLine(""),
+    e.PrintLine("B&H PHOTO & VIDEO"),
+    e.PrintLine("420 NINTH AVE."),
+    e.PrintLine("NEW YORK, NY 10001"),
+    e.PrintLine("(212) 502-6380 - (800)947-9975"),
+    e.SetStyles(PrintStyle.Underline),
+    e.PrintLine("www.bhphotovideo.com"),
+    e.SetStyles(PrintStyle.None),
+    e.PrintLine(""),
+    e.LeftAlign(),
+    e.PrintLine("Order: 123456789        Date: 02/01/19"),
+    e.PrintLine(""),
+    e.PrintLine(""),
+    e.SetStyles(PrintStyle.FontB),
+    e.PrintLine("1   TRITON LOW-NOISE IN-LINE MICROPHONE PREAMP"),
+    e.PrintLine("    TRFETHEAD/FETHEAD                        89.95         89.95"),
+    e.PrintLine("----------------------------------------------------------------"),
+    e.RightAlign(),
+    e.PrintLine("SUBTOTAL         89.95"),
+    e.PrintLine("Total Order:         89.95"),
+    e.PrintLine("Total Payment:         89.95"),
+    e.PrintLine(""),
+    e.LeftAlign(),
+    e.SetStyles(PrintStyle.Bold | PrintStyle.FontB),
+    e.PrintLine("SOLD TO:                        SHIP TO:"),
+    e.SetStyles(PrintStyle.FontB),
+    e.PrintLine("  FIRSTN LASTNAME                 FIRSTN LASTNAME"),
+    e.PrintLine("  123 FAKE ST.                    123 FAKE ST."),
+    e.PrintLine("  DECATUR, IL 12345               DECATUR, IL 12345"),
+    e.PrintLine("  (123)456-7890                   (123)456-7890"),
+    e.PrintLine("  CUST: 87654321"),
+    e.PrintLine(""),
+    e.PrintLine("")
+                );
 
-        );
-        
-        await System.IO.File.WriteAllBytesAsync("/dev/usb/lp0", bytes);
+                var tempFile = Path.GetTempFileName();
 
-                return Ok(new { message = "Test print sent successfully" });
+                await System.IO.File.WriteAllBytesAsync(tempFile, bytes);
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "/usr/bin/lp",
+                        Arguments = $"-d Q3X -o raw {tempFile}",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                    }
+                };
+
+                process.Start();
+                await process.WaitForExitAsync();
+
+                //刪除暫存
+                System.IO.File.Delete(tempFile);
+
+                if (process.ExitCode == 0)
+                {
+                    return Ok(new { message = "Test print sent successfully" });
+
+                }
+                else
+                {
+                    var error = await process.StandardError.ReadToEndAsync();
+                    return BadRequest(new { error });
+                }
             }
             catch (Exception ex)
             {
