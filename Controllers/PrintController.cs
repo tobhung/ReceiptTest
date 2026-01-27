@@ -1,13 +1,9 @@
 // Controllers/PrintController.cs
 using Microsoft.AspNetCore.Mvc;
-using ReceiptTest.Models;
 using ReceiptTest.Services;
 using ESCPOS_NET;
-using ESCPOS_NET.Printers;
 using ESCPOS_NET.Emitters;
-using System;
 using System.Drawing.Printing;
-using ESC_POS_USB_NET.Printer;
 using System.Text;
 using ESCPOS_NET.Utilities;
 using System.Diagnostics;
@@ -29,96 +25,7 @@ namespace ReceiptTest.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("receipt")]
-        public async Task<IActionResult> PrintReceipt([FromBody] Print request)
-        {
-            if (string.IsNullOrEmpty(request.Content))
-            {
-                return BadRequest(new { message = "Content is required" });
-            }
-
-            var result = await _printerService.PrintReceipt(request);
-            
-            if (result)
-            {
-                return Ok(new { message = "Print job sent successfully" });
-            }
-            
-            return StatusCode(500, new { message = "Failed to send print job" });
-        }
-
-        [HttpPost("formatted")]
-        public async Task<IActionResult> PrintFormatted([FromBody] FormattedPrintRequest request)
-        {
-            try
-            {
-                var e = new EPSON();
-                var printer = new FilePrinter(filePath: @"\\DESKTOP-F6LR2M9\QX3");
-                // BasePrinter printer = GetPrinter();
-
-                printer.Write(e.Initialize());
-
-                // Header
-                if (!string.IsNullOrEmpty(request.Header))
-                {
-                    printer.Write(
-                        e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
-                        e.CenterAlign(),
-                        e.PrintLine(request.Header),
-                        e.SetStyles(PrintStyle.None),
-                        e.LeftAlign(),
-                        e.PrintLine("================================")
-                    );
-                }
-
-                // Body
-                if (!string.IsNullOrEmpty(request.Body))
-                {
-                    var lines = request.Body.Split('\n');
-                    foreach (var line in lines)
-                    {
-                        printer.Write(e.PrintLine(line));
-                    }
-                }
-
-                // Footer
-                if (!string.IsNullOrEmpty(request.Footer))
-                {
-                    printer.Write(
-                        e.PrintLine("================================"),
-                        e.CenterAlign(),
-                        e.PrintLine(request.Footer),
-                        e.LeftAlign()
-                    );
-                }
-
-                // Barcode if provided
-                if (!string.IsNullOrEmpty(request.Barcode))
-                {
-                    printer.Write(
-                        e.PrintLine(""),
-                        e.CenterAlign(),
-                        // e.Code128(request.Barcode),
-                        e.LeftAlign()
-                    );
-                }
-
-                // Cut paper
-                printer.Write(
-                    e.PrintLine(""),
-                    e.PrintLine("")
-                    // e.FullPaperCut()
-                );
-
-                return Ok(new { message = "Formatted receipt printed successfully" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error printing formatted receipt");
-                return StatusCode(500, new { message = $"Failed to print: {ex.Message}" });
-            }
-        }
-
+        
         [HttpPost("test")]
         public async Task<IActionResult> TestPrint()
         {
@@ -126,29 +33,29 @@ namespace ReceiptTest.Controllers
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
-                var encoding = System.Text.Encoding.GetEncoding("GB18030"); //chinese
-                Encoding gb18030 = Encoding.GetEncoding("GB18030");
+                var encoding = System.Text.Encoding.GetEncoding("BIG5"); //traditional chinese
+             
                 var url = "https://www.google.com";
 
                 string imagePath = Path.Combine(AppContext.BaseDirectory, "images", "logo.png");
-                
+                var chinese = "測試商品 | 繁中繁中繁中繁中繁中 \n";
+                var imageBytes = System.IO.File.ReadAllBytes("images/logo.png");
+
+                //todo: generate 2 qrcodes to combine as 1 image 
+                //https://blog.miniasp.com/post/2023/08/30/How-to-use-QRCoder-generates-QR-Code-using-dotNet
 
                 var e = new EPSON();
 
-                var chinese = "測試商品 \n";
-                var chinese2 = "測試商品\n";
                 byte[] bytes = ByteSplicer.Combine(
                 e.CenterAlign(),
-                //e.PrintImage(System.IO.File.ReadAllBytes("images/logo.png"), isHiDPI: true, isLegacy: false),
-                //e.PrintImage(System.IO.File.ReadAllBytes("images/pd-logo-300.png"), true),
-                e.PrintQRCode(url, TwoDimensionCodeType.QRCODE_MODEL2, Size2DCode.LARGE, CorrectionLevel2DCode.PERCENT_30),
+                e.PrintImage(imageBytes, false, true, 300, 0), //max width 300
                 e.PrintLine(""),
                 e.SetBarcodeHeightInDots(360),
                 e.SetBarWidth(BarWidth.Default),
                 e.SetBarLabelPosition(BarLabelPrintPosition.None),
                 e.PrintBarcode(BarcodeType.ITF, "0123456789"),
                 e.PrintLine(""),
-                e.PrintLine("B&H PHOTO & VIDEO"),
+                encoding.GetBytes("墾丁航空"),
                 e.PrintLine("420 NINTH AVE."),
                 e.PrintLine("NEW YORK, NY 10001"),
                 e.PrintLine("(212) 502-6380 - (800)947-9975"),
@@ -162,7 +69,7 @@ namespace ReceiptTest.Controllers
                 e.PrintLine(""),
                 e.SetStyles(PrintStyle.FontB),
                 encoding.GetBytes(chinese),
-                e.PrintLine($"    {encoding.GetBytes(chinese2)}                        89.95         89.95"),
+                e.PrintLine("    TRFETHEAD/FETHEAD                        89.95         89.95"),
                 e.PrintLine("----------------------------------------------------------------"),
                 e.RightAlign(),
                 e.PrintLine("SUBTOTAL         89.95"),
@@ -170,14 +77,11 @@ namespace ReceiptTest.Controllers
                 e.PrintLine("Total Payment:         89.95"),
                 e.PrintLine(""),
                 e.LeftAlign(),
-                e.SetStyles(PrintStyle.Bold | PrintStyle.FontB),
-                e.PrintLine("SOLD TO:                        SHIP TO:"),
-                e.SetStyles(PrintStyle.FontB),
-                e.PrintLine("  FIRSTN LASTNAME                 FIRSTN LASTNAME"),
-                e.PrintLine("  123 FAKE ST.                    123 FAKE ST."),
-                e.PrintLine("  DECATUR, IL 12345               DECATUR, IL 12345"),
-                e.PrintLine("  (123)456-7890                   (123)456-7890"),
-                e.PrintLine("  CUST: 87654321"),
+                e.PrintQRCode($"{encoding.GetBytes("測試一下")}", TwoDimensionCodeType.QRCODE_MODEL2, Size2DCode.LARGE, CorrectionLevel2DCode.PERCENT_30),
+                e.RightAlign(),
+                e.PrintQRCode($"{encoding.GetBytes("測試兩下")}", TwoDimensionCodeType.QRCODE_MODEL2, Size2DCode.LARGE, CorrectionLevel2DCode.PERCENT_30),
+                e.PrintLine(""),
+                e.PrintLine(""),
                 e.PrintLine(""),
                 e.PrintLine(""),
                 e.FullCut()
@@ -232,14 +136,17 @@ namespace ReceiptTest.Controllers
             }
 
             var result = await _printerService.PrintRaw(content);
-            
+
             if (result)
             {
                 return Ok(new { message = "Print job sent successfully" });
             }
-            
+
             return StatusCode(500, new { message = "Failed to send print job" });
         }
+        
+        
+
 
         private BasePrinter GetPrinter()
         {

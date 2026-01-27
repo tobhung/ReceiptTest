@@ -57,7 +57,6 @@ C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\ReceiptTest.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\ReceiptTest.pdb
-C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\ESC-POS-USB-NET.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\ESCPOS_NET.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\Microsoft.OpenApi.dll
@@ -123,3 +122,11 @@ C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publi
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Debug\net8.0\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json

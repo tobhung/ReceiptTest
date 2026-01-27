@@ -5,7 +5,6 @@ C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\ReceiptTest.dep
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\ReceiptTest.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\ReceiptTest.pdb
-C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\ESC-POS-USB-NET.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\ESCPOS_NET.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\Microsoft.OpenApi.dll
@@ -383,3 +382,11 @@ C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json

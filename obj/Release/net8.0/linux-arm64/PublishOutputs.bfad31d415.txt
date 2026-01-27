@@ -11,6 +11,14 @@ C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\appset
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\appsettings.Development.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\ReceiptTest.deps.json
@@ -345,7 +353,6 @@ C:\Users\User\Desktop\ReceiptTest\publish\libhostfxr.so
 C:\Users\User\Desktop\ReceiptTest\publish\libhostpolicy.so
 C:\Users\User\Desktop\ReceiptTest\publish\libmscordaccore.so
 C:\Users\User\Desktop\ReceiptTest\publish\libmscordbi.so
-C:\Users\User\Desktop\ReceiptTest\publish\ESC-POS-USB-NET.dll
 C:\Users\User\Desktop\ReceiptTest\publish\ESCPOS_NET.dll
 C:\Users\User\Desktop\ReceiptTest\publish\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\User\Desktop\ReceiptTest\publish\Microsoft.OpenApi.dll
