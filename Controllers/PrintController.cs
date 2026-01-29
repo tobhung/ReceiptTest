@@ -1,12 +1,15 @@
 // Controllers/PrintController.cs
 using Microsoft.AspNetCore.Mvc;
-using ReceiptTest.Services;
 using ESCPOS_NET;
 using ESCPOS_NET.Emitters;
 using System.Drawing.Printing;
 using System.Text;
 using ESCPOS_NET.Utilities;
 using System.Diagnostics;
+using ReceiptTest.Models;
+using ReceiptTest.Codes;
+using System.Drawing;
+using SixLabors.ImageSharp;
 
 namespace ReceiptTest.Controllers
 {
@@ -14,18 +17,16 @@ namespace ReceiptTest.Controllers
     [Route("api/[controller]")]
     public class PrintController : ControllerBase
     {
-        private readonly IPrinterService _printerService;
         private readonly ILogger<PrintController> _logger;
         private readonly IConfiguration _configuration;
 
-        public PrintController(IPrinterService printerService, ILogger<PrintController> logger, IConfiguration configuration)
+        public PrintController( ILogger<PrintController> logger, IConfiguration configuration)
         {
-            _printerService = printerService;
+            
             _logger = logger;
             _configuration = configuration;
         }
 
-        
         [HttpPost("test")]
         public async Task<IActionResult> TestPrint()
         {
@@ -127,25 +128,52 @@ namespace ReceiptTest.Controllers
             }
         }
 
-        [HttpPost("raw")]
-        public async Task<IActionResult> PrintRaw([FromBody] string content)
+        [HttpPost("receipt")]
+        public async Task<IActionResult> PrintReceipt([FromBody] StoreRequest model)
         {
-            if (string.IsNullOrEmpty(content))
+
+            var escpos = BitmapRender.GetTaiwanReceiptBytes(model);
+
+            var e = new EPSON();
+            var bytes = ByteSplicer.Combine(
+                e.Initialize(),
+                escpos,
+                e.FeedLines(3),
+                e.FullCut()
+            );
+
+            var temp = Path.GetTempFileName();
+            await System.IO.File.WriteAllBytesAsync(temp, bytes);
+
+            var process = new Process
             {
-                return BadRequest(new { message = "Content is required" });
-            }
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/usr/bin/lp",
+                    Arguments = $"-d Q3X -o raw {temp}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                }
+            };
+            
+            process.Start();
+            await process.WaitForExitAsync();
 
-            var result = await _printerService.PrintRaw(content);
+                //刪除暫存
+            System.IO.File.Delete(temp);
 
-            if (result)
+            if (process.ExitCode == 0)
             {
-                return Ok(new { message = "Print job sent successfully" });
-            }
+                    return Ok(new { message = "Test print sent successfully" });
 
-            return StatusCode(500, new { message = "Failed to send print job" });
+                }
+                else
+                {
+                    var error = await process.StandardError.ReadToEndAsync();
+                    return BadRequest(new { error });
+                }
         }
-        
-        
 
 
         private BasePrinter GetPrinter()

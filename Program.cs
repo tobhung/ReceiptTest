@@ -1,7 +1,6 @@
-using ReceiptTest.Services;
-using ReceiptTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using ReceiptTest.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IPrinterService, PrinterService>();
+// builder.Services.AddScoped<IPrinterService, PrinterService>();
 
 builder.Services.AddCors(options =>
 {
