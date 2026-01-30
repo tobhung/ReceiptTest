@@ -5,6 +5,7 @@ using SixLabors.ImageSharp.Processing;
 using SixLabors.Fonts;
 using ReceiptTest.Models;
 using System.Text;
+using QRCoder;
 
 namespace ReceiptTest.Codes;
 
@@ -158,7 +159,7 @@ public class BitmapRender
             // Resize logo to fit (e.g., max width 200px)
             logo.Mutate(x => x
                 .Resize(new ResizeOptions { 
-                    Size = new Size(200, 0), 
+                    Size = new Size(400, 0), 
                     Mode = ResizeMode.Max 
                 })
                 .Grayscale()
@@ -178,7 +179,7 @@ public class BitmapRender
         }
 
         // 3. Add a little space after logo
-         data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
+        data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
 
         // --- 2. Title (Large Font) ---
         data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center Align
@@ -224,8 +225,8 @@ public class BitmapRender
         // the most reliable way to get two side-by-side is to render 
         // ONLY the QR code section as a small 384x150 bitmap.
 
-        //byte[] qrSection = GenerateQRSection(model.LeftQRData, model.RightQRData);
-        //data.AddRange(qrSection);
+        byte[] qrSection = GenerateQRCodes(model.LeftQRData, model.RightQRData);
+        data.AddRange(qrSection);
 
         // --- 7. Footer & Cut ---
         data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center
@@ -236,43 +237,65 @@ public class BitmapRender
         return data.ToArray();
     }
 
-    public static byte[] GenerateQRSection(string leftData, string rightData)
+  public static byte[] GenerateQRCodes(string leftData, string rightData)
+  {
+    // 1. Create the canvas (384px is standard for 58mm thermal printers)
+    using (var canvas = new Image<Rgba32>(384, 150))
     {
-        // Use ImageSharp to create a small canvas
-        using (var canvas = new Image<Rgba32>(384, 150))
-        {
-            canvas.Mutate(ctx => ctx.Fill(Color.White));
+        canvas.Mutate(ctx => ctx.Fill(Color.White));
 
-            // Use QRCoder or similar to generate two Bitmaps, 
-            // then draw them onto 'canvas' at:
-            // Left: (x: 40, y: 10)
-            // Right: (x: 210, y: 10)
+       
+        DrawQRCode(canvas, leftData, 40, 10);
+        DrawQRCode(canvas, rightData, 210, 10);
 
-            // After drawing both QR codes onto the canvas:
+            // 3. Convert to ESC/POS bytes
             return ImageToEscPos(canvas);
+        
+        }
+  }
+
+    private static void DrawQRCode(Image<Rgba32> canvas, string data, int x, int y)
+    {
+    using (var qrGenerator = new QRCodeGenerator())
+    using (var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q))
+    {
+        // We use PngByteQRCode to get a format ImageSharp can easily load
+        var qrCode = new PngByteQRCode(qrCodeData);
+        byte[] qrBytes = qrCode.GetGraphic(4); // 4 pixels per module
+
+        using (var qrImage = Image.Load<Rgba32>(qrBytes))
+        {
+            // Resize if necessary (e.g., to 130x130 to fit your 150 height)
+            qrImage.Mutate(img => img.Resize(130, 130));
+
+                // Draw the QR onto the main canvas
+                canvas.Mutate(ctx => ctx.DrawImage(qrImage, new Point(x, y), 1f));
+
+                qrImage.SaveAsPng("~/download");
         }
     }
+}
 
     public static void AddBarcode(List<byte> data, string invoiceText)
-{
-    // 1. Set barcode height (0x1D 0x68 n) - n = dots (e.g., 60 to 100)
-    data.AddRange(new byte[] { 0x1D, 0x68, 80 });
+    {
+        // 1. Set barcode height (0x1D 0x68 n) - n = dots (e.g., 60 to 100)
+        data.AddRange(new byte[] { 0x1D, 0x68, 80 });
 
-    // 2. Set barcode width (0x1D 0x77 n) - n = 2 or 3 (2 is thinner)
-    data.AddRange(new byte[] { 0x1D, 0x77, 2 });
+        // 2. Set barcode width (0x1D 0x77 n) - n = 2 or 3 (2 is thinner)
+        data.AddRange(new byte[] { 0x1D, 0x77, 2 });
 
-    // 3. Set text position (0x1D 0x48 n) - 0: None, 2: Below
-    data.AddRange(new byte[] { 0x1D, 0x48, 0 });
+        // 3. Set text position (0x1D 0x48 n) - 0: None, 2: Below
+        data.AddRange(new byte[] { 0x1D, 0x48, 0 });
 
-    // 4. Print Barcode (GS k m n d1...dn)
-    // m = 73 is Code128
-    data.AddRange(new byte[] { 0x1D, 0x6B, 73 }); 
+        // 4. Print Barcode (GS k m n d1...dn)
+        // m = 73 is Code128
+        data.AddRange(new byte[] { 0x1D, 0x6B, 73 }); 
     
-    // n = length of data
-    data.Add((byte)invoiceText.Length);
+        // n = length of data
+        data.Add((byte)invoiceText.Length);
 
-    // d = the actual text bytes
-    data.AddRange(Encoding.ASCII.GetBytes(invoiceText));
-}
+        // d = the actual text bytes
+        data.AddRange(Encoding.ASCII.GetBytes(invoiceText));
+    }
 
 }

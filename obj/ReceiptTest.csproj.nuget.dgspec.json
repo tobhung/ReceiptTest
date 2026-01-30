@@ -51,6 +51,10 @@
               "target": "Package",
               "version": "[8.0.22, )"
             },
+            "QRCoder": {
+              "target": "Package",
+              "version": "[1.7.0, )"
+            },
             "SixLabors.Fonts": {
               "target": "Package",
               "version": "[2.1.3, )"

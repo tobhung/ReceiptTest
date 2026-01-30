@@ -404,3 +404,16 @@ C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\QRCoder.dll
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\bin\Release\net8.0\linux-arm64\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json

@@ -21,6 +21,18 @@ C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publis
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.Development.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\appsettings.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
+C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.runtimeconfig.json
 C:\Users\User\Desktop\ReceiptTest\publish\publish\publish\publish\publish\publish\publish\publish\publish\publish\ReceiptTest.deps.json
@@ -369,6 +381,7 @@ C:\Users\User\Desktop\ReceiptTest\publish\ESCPOS_NET.dll
 C:\Users\User\Desktop\ReceiptTest\publish\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\User\Desktop\ReceiptTest\publish\Microsoft.OpenApi.dll
 C:\Users\User\Desktop\ReceiptTest\publish\Microsoft.Win32.SystemEvents.dll
+C:\Users\User\Desktop\ReceiptTest\publish\QRCoder.dll
 C:\Users\User\Desktop\ReceiptTest\publish\SixLabors.Fonts.dll
 C:\Users\User\Desktop\ReceiptTest\publish\SixLabors.ImageSharp.dll
 C:\Users\User\Desktop\ReceiptTest\publish\SixLabors.ImageSharp.Drawing.dll

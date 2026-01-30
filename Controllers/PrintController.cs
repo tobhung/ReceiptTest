@@ -138,7 +138,6 @@ namespace ReceiptTest.Controllers
             var bytes = ByteSplicer.Combine(
                 e.Initialize(),
                 escpos,
-                e.FeedLines(3),
                 e.FullCut()
             );
 
