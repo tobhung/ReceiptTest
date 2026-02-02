@@ -6,55 +6,12 @@ using SixLabors.Fonts;
 using ReceiptTest.Models;
 using System.Text;
 using QRCoder;
+using System.Drawing;
 
 namespace ReceiptTest.Codes;
 
 public class BitmapRender
 {
-    public static Image<Rgba32> Render(StoreRequest model)
-    {
-        int width = 384;
-        int height = 1200;
-
-        var image = new Image<Rgba32>(width, height);
-        image.Mutate(ctx => ctx.Fill(Color.White));
-
-        var fontCollection = new FontCollection();
-        var family = fontCollection.Add("/usr/share/fonts/truetype/noto/NotoSansMono-Regular.ttf");
-
-        var font = family.CreateFont(22, FontStyle.Regular);
-        int y = 20;
-
-        var options = new TextOptions(font)
-        {
-            Origin = new PointF(10, y),
-            WrappingLength = width - 20
-        };
-
-        void Draw(string text)
-        {
-            image.Mutate(ctx =>
-                ctx.DrawText(text, font, Color.Black, new PointF(10, y)));
-            y += 30;
-        }
-
-        Draw(model.Name);
-        Draw($"發票號碼 {model.InvoiceNO}");
-        Draw(model.Date.ToString("yyyy/MM/dd HH:mm"));
-        Draw("--------------------------------");
-
-        foreach (var item in model.Items)
-        {
-            Draw(item.Name);
-            Draw($"{item.Qty} x {item.Price} = {item.Qty * item.Price}");
-        }
-
-        Draw("--------------------------------");
-        Draw($"總計 {model.Total}");
-
-        return image.Clone(ctx => ctx.Crop(width, y + 20));
-    }
-
     public static byte[] ImageToEscPos(Image<Rgba32> img)
     {
         int widthBytes = (img.Width + 7) / 8;
@@ -94,45 +51,6 @@ public class BitmapRender
         return data.ToArray();
     }
 
-    // this worked
-    public static byte[] GetPrintBytes(StoreRequest model)
-    {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        var big5 = Encoding.GetEncoding("BIG5");
-        var data = new List<byte>();
-
-        // 1. Initialize Printer
-        data.AddRange(new byte[] { 0x1B, 0x40 });
-
-        // 2. Select International Character Set (Taiwan)
-        // Some printers use 0x1B 0x52 0x0F, others use 0x1C 0x26 to enter Chinese mode
-        data.AddRange(new byte[] { 0x1C, 0x26 });
-
-        void WriteLine(string text)
-        {
-            data.AddRange(big5.GetBytes(text + "\n"));
-        }
-
-        WriteLine(model.Name);
-        WriteLine($"發票號碼: {model.InvoiceNO}");
-        WriteLine(model.Date.ToString("yyyy/MM/dd HH:mm"));
-        WriteLine("--------------------------------");
-
-        foreach (var item in model.Items)
-        {
-            WriteLine(item.Name);
-            WriteLine($"{item.Qty} x {item.Price} = {item.Qty * item.Price}");
-        }
-
-        WriteLine("--------------------------------");
-        WriteLine($"總計: {model.Total}");
-
-        // Cut Paper
-        data.AddRange(new byte[] { 0x1D, 0x56, 0x42, 0x00 });
-
-        return data.ToArray();
-    }
-
     public static byte[] GetTaiwanReceiptBytes(StoreRequest model)
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -154,12 +72,12 @@ public class BitmapRender
 
         if (File.Exists(logoPath))
         {
-            var logo = Image.Load<Rgba32>(logoPath);
+            var logo = SixLabors.ImageSharp.Image.Load<Rgba32>(logoPath);
             
             // Resize logo to fit (e.g., max width 200px)
             logo.Mutate(x => x
                 .Resize(new ResizeOptions { 
-                    Size = new Size(400, 0), 
+                    Size = new SixLabors.ImageSharp.Size(400, 0), 
                     Mode = ResizeMode.Max 
                 })
                 .Grayscale()
@@ -169,9 +87,9 @@ public class BitmapRender
             // or just center the 200px image in your ImageToEscPos logic.
             var canvas = new Image<Rgba32>(384, logo.Height);
             
-            canvas.Mutate(ctx => ctx.Fill(Color.White));
+            canvas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.White));
                 // Draw logo in the center of the 384px canvas
-            canvas.Mutate(ctx => ctx.DrawImage(logo, new Point((384 - logo.Width) / 2, 0), 1f));
+            canvas.Mutate(ctx => ctx.DrawImage(logo, new SixLabors.ImageSharp.Point((384 - logo.Width) / 2, 0), 1f));
                 
                 // Convert processed image to printer commands
             data.AddRange(ImageToEscPos(canvas));
@@ -242,7 +160,7 @@ public class BitmapRender
     // 1. Create the canvas (384px is standard for 58mm thermal printers)
     using (var canvas = new Image<Rgba32>(384, 150))
     {
-        canvas.Mutate(ctx => ctx.Fill(Color.White));
+        canvas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.White));
 
        
         DrawQRCode(canvas, leftData, 40, 10);
@@ -263,13 +181,13 @@ public class BitmapRender
         var qrCode = new PngByteQRCode(qrCodeData);
         byte[] qrBytes = qrCode.GetGraphic(4); // 4 pixels per module
 
-        using (var qrImage = Image.Load<Rgba32>(qrBytes))
+        using (var qrImage = SixLabors.ImageSharp.Image.Load<Rgba32>(qrBytes))
         {
             // Resize if necessary (e.g., to 130x130 to fit your 150 height)
             qrImage.Mutate(img => img.Resize(130, 130));
 
                 // Draw the QR onto the main canvas
-                canvas.Mutate(ctx => ctx.DrawImage(qrImage, new Point(x, y), 1f));
+                canvas.Mutate(ctx => ctx.DrawImage(qrImage, new SixLabors.ImageSharp.Point(x, y), 1f));
 
                 qrImage.SaveAsPng("~/download");
         }
@@ -289,13 +207,90 @@ public class BitmapRender
 
         // 4. Print Barcode (GS k m n d1...dn)
         // m = 73 is Code128
-        data.AddRange(new byte[] { 0x1D, 0x6B, 73 }); 
-    
+        data.AddRange(new byte[] { 0x1D, 0x6B, 73 });
+
         // n = length of data
         data.Add((byte)invoiceText.Length);
 
         // d = the actual text bytes
         data.AddRange(Encoding.ASCII.GetBytes(invoiceText));
+    }
+
+    public static byte[] ConvertLogo(byte[] imageBytes)
+    {
+        // 1. 使用 ImageSharp 載入圖片
+        using (Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(imageBytes))
+        {
+            // 2. 縮放至 384 像素寬度 (57mm 紙張標準)
+            int targetWidth = 384;
+            int targetHeight = (int)((double)image.Height * targetWidth / image.Width);
+
+            // 使用高品質 Bicubic 縮放
+            image.Mutate(x => x.Resize(targetWidth, targetHeight, KnownResamplers.Bicubic));
+
+            // 3. 轉換為 ESC/POS 二進位位元流 (GS v 0 指令)
+            return ConvertToEscPos(image);
+        }
+    }
+
+    private static byte[] ConvertToEscPos(Image<Rgba32> image)
+    {
+        int width = image.Width;
+        int height = image.Height;
+        int widthBytes = (width + 7) / 8; // 每 8 個點組成一個 Byte
+        
+        List<byte> data = new List<byte>();
+
+        // ESC/POS 指令: GS v 0 m xL xH yL yH
+        // 這是熱感印表機列印點陣圖的標準指令
+        data.AddRange(new byte[] { 
+            0x1D, 0x76, 0x30, 0, 
+            (byte)(widthBytes % 256), (byte)(widthBytes / 256), 
+            (byte)(height % 256), (byte)(height / 256) 
+        });
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int xByte = 0; xByte < widthBytes; xByte++)
+            {
+                byte currentByte = 0;
+                for (int bit = 0; bit < 8; bit++)
+                {
+                    int xPixel = (xByte * 8) + bit;
+                    if (xPixel < width)
+                    {
+                        // 取得像素
+                        var pixel = image[xPixel, y];
+                        
+                        // 計算亮度 (Luminance) 決定黑白
+                        // 這是標準的灰階公式: 0.299*R + 0.587*G + 0.114*B
+                        double gray = (0.299 * pixel.R) + (0.587 * pixel.G) + (0.114 * pixel.B);
+                        
+                        // 如果透明度太低或顏色夠深，就印出黑色 (1)
+                        if (pixel.A > 128 && gray < 128) 
+                        {
+                            currentByte |= (byte)(0x80 >> bit);
+                        }
+                    }
+                }
+                data.Add(currentByte);
+            }
+        }
+        return data.ToArray();
+    }
+    
+    
+
+    public static byte[] ParseRawHex(string hexInput)
+    {
+    if (string.IsNullOrWhiteSpace(hexInput)) return Array.Empty<byte>();
+
+   
+        // Clean up brackets, spaces, and "0x" prefixes
+        var cleaned = hexInput.Replace("{", "").Replace("}", "").Replace("0x", "").Replace(" ", "");
+        var hexParts = cleaned.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+        return hexParts.Select(s => Convert.ToByte(s.Trim(), 16)).ToArray();
     }
 
 }

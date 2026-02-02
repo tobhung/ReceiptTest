@@ -35,7 +35,7 @@ namespace ReceiptTest.Controllers
             try
             {
                 var encoding = System.Text.Encoding.GetEncoding("BIG5"); //traditional chinese
-             
+
                 var url = "https://www.google.com";
 
                 string imagePath = Path.Combine(AppContext.BaseDirectory, "images", "logo.png");
@@ -126,6 +126,97 @@ namespace ReceiptTest.Controllers
                 _logger.LogError(ex, "Test print failed");
                 return StatusCode(500, new { message = $"Test failed: {ex.Message}" });
             }
+        }
+
+        [HttpPost("raw")]
+        public async Task<IActionResult> PrintRawReceipt([FromBody] PrintRequest request)
+        {
+            var e = new EPSON();
+            var bytes = new List<byte>();
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            var encoding = Encoding.GetEncoding("BIG5");
+
+            bytes.AddRange(e.Initialize());
+
+            foreach (var item in request.PrintItems)
+            {
+                switch (item.Type.ToLower())
+                {
+                    case "logo":
+
+                    string base64String = item.Content.ToString();
+    
+
+                if (base64String.Contains(","))
+                {
+                base64String = base64String.Split(',')[1];
+                }
+                        byte[] imageBytes = Convert.FromBase64String(base64String);
+
+                        bytes.AddRange(BitmapRender.ConvertLogo(imageBytes));
+
+                        break;
+                    case "string":
+                        string rawStr = item.Content.ToString();
+                        if (rawStr.Contains("{"))
+                        {
+                            var parts = rawStr.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var part in parts)
+                            {
+                                if (part.Contains("0x"))
+                                {
+                                    bytes.AddRange(BitmapRender.ParseRawHex(part));
+                                }
+                                else
+                                {
+                                    bytes.AddRange(encoding.GetBytes(part));
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            bytes.AddRange(encoding.GetBytes(rawStr + "\n"));
+                        }
+                        break;
+                }
+            }
+
+            bytes.AddRange(e.FullCut());
+
+            var tempFile = Path.GetTempFileName();
+
+                await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "/usr/bin/lp",
+                        Arguments = $"-d Q3X -o raw {tempFile}",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                    }
+                };
+
+                process.Start();
+                await process.WaitForExitAsync();
+
+                //刪除暫存
+                System.IO.File.Delete(tempFile);
+
+                if (process.ExitCode == 0)
+                {
+                    return Ok(new { message = "Test print sent successfully" });
+
+                }
+                else
+                {
+                    var error = await process.StandardError.ReadToEndAsync();
+                    return BadRequest(new { error });
+                }
         }
 
         [HttpPost("receipt")]
