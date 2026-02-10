@@ -201,7 +201,7 @@ namespace ReceiptTest.Controllers
 
             image.Mutate(x => x.Resize(new ResizeOptions
             {
-                Size = new SixLabors.ImageSharp.Size(image.Width, newHeight),
+                Size = new SixLabors.ImageSharp.Size(paperWidth, newHeight),
                 Mode = ResizeMode.Min,
 
             }).Grayscale());
@@ -267,8 +267,22 @@ namespace ReceiptTest.Controllers
             }
             else
             {
+
                 var error = await process.StandardError.ReadToEndAsync();
-                return BadRequest(new { error });
+                var msg = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+                var msg2 = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                return BadRequest(new { error, message = msg2});
+
+                }
+                else
+                {
+                return BadRequest(new { error, message = msg});
+                    
+                }
+                return BadRequest(new { error});
             }
         }
         
