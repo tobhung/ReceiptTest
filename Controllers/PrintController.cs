@@ -201,7 +201,7 @@ namespace ReceiptTest.Controllers
 
             image.Mutate(x => x.Resize(new ResizeOptions
             {
-                Size = new SixLabors.ImageSharp.Size(paperWidth, newHeight),
+                Size = new SixLabors.ImageSharp.Size(image.Width, newHeight),
                 Mode = ResizeMode.Min,
 
             }).Grayscale());

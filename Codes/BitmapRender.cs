@@ -211,11 +211,6 @@ public class BitmapRender
             Mode = ResizeMode.Stretch
         }).Grayscale());
 
-
-        //binarythreshold 0.5f becomes bolder
-
-
-        //return TrueFullSize(image);
         return TrueFullSize(image);
     }
 
@@ -324,7 +319,7 @@ public class BitmapRender
 
         // Paper Feed (3 lines) and Cut
         //bw.Write(new byte[] { 0x1B, 0x64, 0x03 }); // Feed 3 lines
-        //bw.Write(new byte[] { 0x1D, 0x56, 0x42, 0x00 }); // Partial cut
+        bw.Write(new byte[] { 0x1D, 0x56, 0x42, 0x00 }); // Partial cut
 
         return ms.ToArray();
     }
