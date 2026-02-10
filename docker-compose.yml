@@ -1,0 +1,16 @@
+services:
+  web-api:
+    container_name: receipt-print-app 
+    image: ghcr.io/tobhung/receipttest:latest
+    ports:
+      - "8080:80"
+    restart: always
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true" # 讓 Watchtower 知道要更新它
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/pi/.docker/config.json:/config.json
+    command: --interval 300 --cleanup --label-enable
