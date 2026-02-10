@@ -14,6 +14,14 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim-arm64v8
 WORKDIR /app
 COPY --from=build /out .
 
+# --- 加入這段：安裝 lp 工具 ---
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends cups-client && \
+    rm -rf /var/lib/apt/lists/*
+# -----------------------------
+
+COPY --from=build /out .
+
 # 告訴 Watchtower：請自動更新這個容器
 LABEL com.centurylinklabs.watchtower.enable="true"
 
