@@ -5,12 +5,20 @@ services:
     ports:
       - "8080:80"
     restart: always
+    # --- 將列印權限給 App ---
+    user: "root"
+    volumes:
+      - /var/run/cups/cups.sock:/var/run/cups/cups.sock
+    # -----------------------------
     labels:
-      - "com.centurylinklabs.watchtower.enable=true" # 讓 Watchtower 知道要更新它
+      - "com.centurylinklabs.watchtower.enable=true"
 
   watchtower:
     image: containrrr/watchtower
+    container_name: watchtower # 建議加上名字，方便你下 logs 指令
+    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/pi/.docker/config.json:/config.json
+      # 注意：請確認你的使用者路徑是 /home/pi 還是 /home/admin
+      - /home/admin/.docker/config.json:/config.json
     command: --interval 300 --cleanup --label-enable
