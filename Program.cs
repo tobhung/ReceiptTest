@@ -10,8 +10,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.Services.AddScoped<IPrinterService, PrinterService>();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
@@ -23,7 +21,7 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -31,7 +29,3 @@ app.MapControllers();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

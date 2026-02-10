@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ReceiptTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ea9f1a716fdc5c26d33a8dbe278fd523d1cb4816")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7a2c8d0fad8a0db904d1626e75b418425c882899")]
 [assembly: System.Reflection.AssemblyProductAttribute("ReceiptTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ReceiptTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

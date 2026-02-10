@@ -2,14 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using ESCPOS_NET;
 using ESCPOS_NET.Emitters;
-using System.Drawing.Printing;
 using System.Text;
 using ESCPOS_NET.Utilities;
 using System.Diagnostics;
 using ReceiptTest.Models;
 using ReceiptTest.Codes;
-using System.Drawing;
+using System.Drawing.Printing;
 using SixLabors.ImageSharp;
+using ESC_POS_USB_NET;
+using System.Drawing;
+using ESC_POS_USB_NET.Printer;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.PixelFormats;
+using System.Runtime.InteropServices;
 
 namespace ReceiptTest.Controllers
 {
@@ -20,12 +25,59 @@ namespace ReceiptTest.Controllers
         private readonly ILogger<PrintController> _logger;
         private readonly IConfiguration _configuration;
 
-        public PrintController( ILogger<PrintController> logger, IConfiguration configuration)
+        public PrintController(ILogger<PrintController> logger, IConfiguration configuration)
         {
-            
+
             _logger = logger;
             _configuration = configuration;
         }
+
+        [HttpPost("testprint")]
+        public async Task<IActionResult> Print([FromBody] Req req)
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var encoding = System.Text.Encoding.GetEncoding("BIG5"); //traditional chinese
+            var printerName = "QX3";
+            var portName = "USB001";
+            var bytes = new List<byte>();
+            int paperWidth = 384;
+
+            string base64String = req.Content.ToString();
+            var imageBytes = Convert.FromBase64String(base64String);
+
+            // Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(imageBytes);
+
+            // var b = "";
+
+            // int newHeight = (int)((float)paperWidth / image.Width * image.Height);
+
+            // image.Mutate(x => x.Resize(new ResizeOptions
+            // {
+            //     Size = new SixLabors.ImageSharp.Size(paperWidth, newHeight),
+            //     Mode = ResizeMode.Min,
+
+            // }).Grayscale());
+
+
+            using (var ms = new MemoryStream(imageBytes))
+            {
+                //image.Save(ms, new SixLabors.ImageSharp.Formats.Bmp.BmpEncoder());
+                //ms.Position = 0;
+                Bitmap bitmap = new Bitmap(ms);
+
+                Printer printer = new Printer("QX3");
+
+                printer.AlignCenter();
+                printer.Image(bitmap);
+                printer.FullPaperCut();
+                printer.PrintDocument();
+            }
+
+            return Ok();
+
+        }
+
+       
 
         [HttpPost("test")]
         public async Task<IActionResult> TestPrint()
@@ -49,7 +101,7 @@ namespace ReceiptTest.Controllers
 
                 byte[] bytes = ByteSplicer.Combine(
                 e.CenterAlign(),
-                e.PrintImage(imageBytes, false, true, 300, 0), //max width 300
+                //e.PrintImage(imageBytes, false, true, 300, 0), //max width 300
                 e.PrintLine(""),
                 e.SetBarcodeHeightInDots(360),
                 e.SetBarWidth(BarWidth.Default),
@@ -129,181 +181,143 @@ namespace ReceiptTest.Controllers
         }
 
         [HttpPost("raw")]
-        public async Task<IActionResult> PrintRawReceipt([FromBody] PrintRequest request)
+        public async Task<IActionResult> PrintRawReceipt([FromBody] Req req)
         {
-            var e = new EPSON();
             var bytes = new List<byte>();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             var encoding = Encoding.GetEncoding("BIG5");
 
-            bytes.AddRange(e.Initialize());
+            int paperWidth = 384;
 
-            foreach (var item in request.PrintItems)
+            string base64String = req.Content.ToString();
+
+            var imageBytes = ImageRender.GetBytes(base64String);
+
+            Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(imageBytes);
+
+            int newHeight = paperWidth / image.Width * image.Height;
+            //int newHeight = (int)((float)paperWidth / image.Width * image.Height);
+
+            image.Mutate(x => x.Resize(new ResizeOptions
             {
-                switch (item.Type.ToLower())
-                {
-                    case "logo":
+                Size = new SixLabors.ImageSharp.Size(paperWidth, newHeight),
+                Mode = ResizeMode.Min,
 
-                    string base64String = item.Content.ToString();
-    
+            }).Grayscale());
 
-                if (base64String.Contains(","))
-                {
-                base64String = base64String.Split(',')[1];
-                }
-                        byte[] imageBytes = Convert.FromBase64String(base64String);
 
-                        bytes.AddRange(BitmapRender.ConvertLogo(imageBytes));
+            //var ms = new MemoryStream();
+            //image.SaveAsBmp(ms);
+            //byte[] imgBytes = ms.ToArray();
 
-                        break;
-                    case "string":
-                        string rawStr = item.Content.ToString();
-                        if (rawStr.Contains("{"))
-                        {
-                            var parts = rawStr.Split(new[] { '{', '}' }, StringSplitOptions.RemoveEmptyEntries);
-                            foreach (var part in parts)
-                            {
-                                if (part.Contains("0x"))
-                                {
-                                    bytes.AddRange(BitmapRender.ParseRawHex(part));
-                                }
-                                else
-                                {
-                                    bytes.AddRange(encoding.GetBytes(part));
-                                }
 
-                            }
-                        }
-                        else
-                        {
-                            bytes.AddRange(encoding.GetBytes(rawStr + "\n"));
-                        }
-                        break;
-                }
-            }
+            var imgarr = BitmapRender.GetImageBinaryData(image);
 
-            bytes.AddRange(e.FullCut());
+            bytes.AddRange(imgarr);
+
+            //var e = new EPSON();
+            // byte[] bytes = ByteSplicer.Combine(
+            // e.CenterAlign(),
+            // e.PrintImage(imageBytes, false, true, -1, 0)
+            // );
+
 
             var tempFile = Path.GetTempFileName();
 
-                await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
+            await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
 
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "/usr/bin/lp",
-                        Arguments = $"-d Q3X -o raw {tempFile}",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                    }
-                };
+            var process = new Process();
 
-                process.Start();
-                await process.WaitForExitAsync();
-
-                //刪除暫存
-                System.IO.File.Delete(tempFile);
-
-                if (process.ExitCode == 0)
-                {
-                    return Ok(new { message = "Test print sent successfully" });
-
-                }
-                else
-                {
-                    var error = await process.StandardError.ReadToEndAsync();
-                    return BadRequest(new { error });
-                }
-        }
-
-        [HttpPost("receipt")]
-        public async Task<IActionResult> PrintReceipt([FromBody] StoreRequest model)
-        {
-
-            var escpos = BitmapRender.GetTaiwanReceiptBytes(model);
-
-            var e = new EPSON();
-            var bytes = ByteSplicer.Combine(
-                e.Initialize(),
-                escpos,
-                e.FullCut()
-            );
-
-            var temp = Path.GetTempFileName();
-            await System.IO.File.WriteAllBytesAsync(temp, bytes);
-
-            var process = new Process
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                StartInfo = new ProcessStartInfo
+                process.StartInfo = new ProcessStartInfo
                 {
-                    FileName = "/usr/bin/lp",
-                    Arguments = $"-d Q3X -o raw {temp}",
+                    FileName = "cmd.exe",
+                    Arguments = $"/c copy /b \"{tempFile}\" \"\\\\DESKTOP-F6LR2M9\\Printer\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                }
-            };
-            
+                    CreateNoWindow = true
+                };
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/usr/bin/lp",
+                    Arguments = $"-d Q3X -o raw {tempFile}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                };
+            }
+
+        
             process.Start();
             await process.WaitForExitAsync();
 
-                //刪除暫存
-            System.IO.File.Delete(temp);
+            //刪除暫存
+            System.IO.File.Delete(tempFile);
 
             if (process.ExitCode == 0)
             {
-                    return Ok(new { message = "Test print sent successfully" });
+                return Ok(new { message = "Test print sent successfully" });
 
-                }
-                else
-                {
-                    var error = await process.StandardError.ReadToEndAsync();
-                    return BadRequest(new { error });
-                }
-        }
-
-
-        private BasePrinter GetPrinter()
-        {
-            var connectionType = _configuration["Printer:ConnectionType"] ;
-
-            Console.WriteLine(connectionType);
-            foreach (string printer in PrinterSettings.InstalledPrinters)
-            {
-                Console.WriteLine(printer);
             }
-
-            if (connectionType.Equals("Network", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                var ipAddress = _configuration["Printer:IPAddress"] ?? "192.168.1.100";
-                var port = int.Parse(_configuration["Printer:Port"] ?? "9100");
-
-                // Use NetworkPrinterSettings
-                var settings = new NetworkPrinterSettings
-                {
-                    ConnectionString = $"{ipAddress}:{port}",
-                    PrinterName = "Birch CP-Q3X"
-                };
-
-                return new NetworkPrinter(settings);
-            }
-
-            else if (connectionType.Equals("Serial", StringComparison.OrdinalIgnoreCase))
-            {
-                var portName = _configuration["Printer:SerialPort"] ?? "/dev/ttyUSB0";
-                var baudRate = int.Parse(_configuration["Printer:BaudRate"] ?? "9600");
-                
-                return new SerialPrinter(portName, baudRate);
-            }
-            else // USB
-            {
-                var printer = new FilePrinter(filePath: "/dev/usb/lp0");
-
-                return new FilePrinter(filePath: "/dev/usb/lp0");
+                var error = await process.StandardError.ReadToEndAsync();
+                return BadRequest(new { error });
             }
         }
+        
+        
+
+        // [HttpPost("receipt")]
+        // public async Task<IActionResult> PrintReceipt([FromBody] StoreRequest model)
+        // {
+
+        //     var escpos = BitmapRender.GetTaiwanReceiptBytes(model);
+
+        //     var e = new EPSON();
+        //     var bytes = ByteSplicer.Combine(
+        //         e.Initialize(),
+        //         escpos,
+        //         e.FullCut()
+        //     );
+
+        //     var temp = Path.GetTempFileName();
+        //     await System.IO.File.WriteAllBytesAsync(temp, bytes);
+
+        //     var process = new Process
+        //     {
+        //         StartInfo = new ProcessStartInfo
+        //         {
+        //             FileName = "/usr/bin/lp",
+        //             Arguments = $"-d Q3X -o raw {temp}",
+        //             RedirectStandardOutput = true,
+        //             RedirectStandardError = true,
+        //             UseShellExecute = false,
+        //         }
+        //     };
+            
+        //     process.Start();
+        //     await process.WaitForExitAsync();
+
+        //         //刪除暫存
+        //     System.IO.File.Delete(temp);
+
+        //     if (process.ExitCode == 0)
+        //     {
+        //             return Ok(new { message = "Test print sent successfully" });
+
+        //         }
+        //         else
+        //         {
+        //             var error = await process.StandardError.ReadToEndAsync();
+        //             return BadRequest(new { error });
+        //         }
+        // }
     }
 }

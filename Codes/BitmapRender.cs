@@ -1,8 +1,6 @@
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.Fonts;
 using ReceiptTest.Models;
 using System.Text;
 using QRCoder;
@@ -51,148 +49,133 @@ public class BitmapRender
         return data.ToArray();
     }
 
-    public static byte[] GetTaiwanReceiptBytes(StoreRequest model)
-    {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        var big5 = Encoding.GetEncoding("BIG5");
+    // public static byte[] GetTaiwanReceiptBytes(StoreRequest model)
+    // {
+    //     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    //     var big5 = Encoding.GetEncoding("BIG5");
 
-        var logoPath = "images/logo.png";
+    //     var logoPath = "images/logo.png";
 
-        var data = new List<byte>();
+    //     var data = new List<byte>();
 
-        var year = model.Date.ToString("yyyy");
-        var currentYear = int.Parse(year) - 1911;
-        var month = int.Parse(model.Date.ToString("MM"));
+    //     var year = model.Date.ToString("yyyy");
+    //     var currentYear = int.Parse(year) - 1911;
+    //     var month = int.Parse(model.Date.ToString("MM"));
 
-        Console.WriteLine(year + " "+currentYear + " " +month);
+    //     Console.WriteLine(year + " "+currentYear + " " +month);
 
-        // --- 1. Initialization ---
-        data.AddRange(new byte[] { 0x1B, 0x40 }); // Initialize
-        data.AddRange(new byte[] { 0x1C, 0x26 }); // Enter Chinese Mode
+    //     // --- 1. Initialization ---
+    //     data.AddRange(new byte[] { 0x1B, 0x40 }); // Initialize
+    //     data.AddRange(new byte[] { 0x1C, 0x26 }); // Enter Chinese Mode
 
-        if (File.Exists(logoPath))
-        {
-            var logo = SixLabors.ImageSharp.Image.Load<Rgba32>(logoPath);
+    //     if (File.Exists(logoPath))
+    //     {
+    //         var logo = SixLabors.ImageSharp.Image.Load<Rgba32>(logoPath);
             
-            // Resize logo to fit (e.g., max width 200px)
-            logo.Mutate(x => x
-                .Resize(new ResizeOptions { 
-                    Size = new SixLabors.ImageSharp.Size(400, 0), 
-                    Mode = ResizeMode.Max 
-                })
-                .Grayscale()
-            );
+    //         // Resize logo to fit (e.g., max width 200px)
+    //         logo.Mutate(x => x
+    //             .Resize(new ResizeOptions { 
+    //                 Size = new SixLabors.ImageSharp.Size(400, 0), 
+    //                 Mode = ResizeMode.Max 
+    //             })
+    //             .Grayscale()
+    //         );
 
-            // We need to pad the logo to 384px to center it easily, 
-            // or just center the 200px image in your ImageToEscPos logic.
-            var canvas = new Image<Rgba32>(384, logo.Height);
+    //         // We need to pad the logo to 384px to center it easily, 
+    //         // or just center the 200px image in your ImageToEscPos logic.
+    //         var canvas = new Image<Rgba32>(384, logo.Height);
             
-            canvas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.White));
-                // Draw logo in the center of the 384px canvas
-            canvas.Mutate(ctx => ctx.DrawImage(logo, new SixLabors.ImageSharp.Point((384 - logo.Width) / 2, 0), 1f));
+    //         canvas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.White));
+    //             // Draw logo in the center of the 384px canvas
+    //         canvas.Mutate(ctx => ctx.DrawImage(logo, new SixLabors.ImageSharp.Point((384 - logo.Width) / 2, 0), 1f));
                 
-                // Convert processed image to printer commands
-            data.AddRange(ImageToEscPos(canvas));
+    //             // Convert processed image to printer commands
+    //         data.AddRange(ImageToEscPos(canvas));
             
-        }
+    //     }
 
-        // 3. Add a little space after logo
-        data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
+    //     // 3. Add a little space after logo
+    //     data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
 
-        // --- 2. Title (Large Font) ---
-        data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center Align
-        data.AddRange(new byte[] { 0x1D, 0x21, 0x11 }); // Double width, double height
-        data.AddRange(big5.GetBytes(model.Name + "\n\n"));
+    //     // --- 2. Title (Large Font) ---
+    //     data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center Align
+    //     data.AddRange(new byte[] { 0x1D, 0x21, 0x11 }); // Double width, double height
+    //     data.AddRange(big5.GetBytes(model.Name + "\n\n"));
 
-        // --- 3. Invoice Header ---
-        data.AddRange(new byte[] { 0x1D, 0x21, 0x11 }); //
-        data.AddRange(big5.GetBytes("電子發票證明聯\n"));
-        data.AddRange(new byte[] { 0x1D, 0x21, 0x00 }); 
-        data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
-        data.AddRange(big5.GetBytes($"{currentYear}年 {month} - {month + 1} 月\n"));
-        data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
-        data.AddRange(big5.GetBytes($"{model.InvoiceNO}\n"));
-        data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
-        data.AddRange(new byte[] { 0x1B, 0x61, 0x00 }); // Left Align
+    //     // --- 3. Invoice Header ---
+    //     data.AddRange(new byte[] { 0x1D, 0x21, 0x11 }); //
+    //     data.AddRange(big5.GetBytes("電子發票證明聯\n"));
+    //     data.AddRange(new byte[] { 0x1D, 0x21, 0x00 }); 
+    //     data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
+    //     data.AddRange(big5.GetBytes($"{currentYear}年 {month} - {month + 1} 月\n"));
+    //     data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
+    //     data.AddRange(big5.GetBytes($"{model.InvoiceNO}\n"));
+    //     data.AddRange(new byte[] { 0x1B, 0x64, 0x01 });
+    //     data.AddRange(new byte[] { 0x1B, 0x61, 0x00 }); // Left Align
 
-        // --- 4. Transaction Info ---
-        data.AddRange(big5.GetBytes($"{model.Date:yyyy-MM-dd HH:mm:ss}\n"));
-        data.AddRange(big5.GetBytes($"隨機碼 {model.RandomCode}  總計 {model.Total}\n"));
-        data.AddRange(big5.GetBytes($"賣方 {model.SellerID}  買方 {model.BuyerID}\n"));
-        data.AddRange(big5.GetBytes("--------------------------------\n"));
+    //     // --- 4. Transaction Info ---
+    //     data.AddRange(big5.GetBytes($"{model.Date:yyyy-MM-dd HH:mm:ss}\n"));
+    //     data.AddRange(big5.GetBytes($"隨機碼 {model.RandomCode}  總計 {model.Total}\n"));
+    //     data.AddRange(big5.GetBytes($"賣方 {model.SellerID}  買方 {model.BuyerID}\n"));
+    //     data.AddRange(big5.GetBytes("--------------------------------\n"));
 
-        data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center align
+    //     data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center align
 
-        // Format: 11502 (Year 115, Feb) + Invoice Number
-        string barcodeData = "11502AB12345678"; 
-        AddBarcode(data, barcodeData);
+    //     // Format: 11502 (Year 115, Feb) + Invoice Number
+    //     string barcodeData = "11502AB12345678"; 
+    //     AddBarcode(data, barcodeData);
 
-        data.AddRange(new byte[] { 0x1B, 0x64, 0x02 }); // Feed 2 lines after barcode
-        // --- 5. Items ---
-        // foreach (var item in model.Items)
-        // {
-        //     // Simple manual padding for price alignment
-        //     string line = $"{item.Name}".PadRight(14);
-        //     string price = $"{item.Qty}x{item.Price}".PadLeft(18);
-        //     data.AddRange(big5.GetBytes(line + price + "\n"));
-        // }
-        data.AddRange(big5.GetBytes("--------------------------------\n"));
+    //     data.AddRange(new byte[] { 0x1B, 0x64, 0x02 }); // Feed 2 lines after barcode
+    
+    //     data.AddRange(big5.GetBytes("--------------------------------\n"));
 
-        // --- 6. The QR Codes (Side-by-Side) ---
-        // Since native ESC/POS usually prints QR codes one per line, 
-        // the most reliable way to get two side-by-side is to render 
-        // ONLY the QR code section as a small 384x150 bitmap.
+    //     byte[] qrSection = GenerateQRCodes(model.LeftQRData, model.RightQRData);
+    //     data.AddRange(qrSection);
 
-        byte[] qrSection = GenerateQRCodes(model.LeftQRData, model.RightQRData);
-        data.AddRange(qrSection);
+    //     // --- 7. Footer & Cut ---
+    //     data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center
+    //     data.AddRange(big5.GetBytes("\n退貨請持證明聯正本辦理\n"));
+    //     data.AddRange(new byte[] { 0x1B, 0x64, 0x05 }); // Feed 5 lines
+    //     data.AddRange(new byte[] { 0x1D, 0x56, 0x42, 0x00 }); // Cut
 
-        // --- 7. Footer & Cut ---
-        data.AddRange(new byte[] { 0x1B, 0x61, 0x01 }); // Center
-        data.AddRange(big5.GetBytes("\n退貨請持證明聯正本辦理\n"));
-        data.AddRange(new byte[] { 0x1B, 0x64, 0x05 }); // Feed 5 lines
-        data.AddRange(new byte[] { 0x1D, 0x56, 0x42, 0x00 }); // Cut
+    //     return data.ToArray();
+    // }
 
-        return data.ToArray();
-    }
+//   public static byte[] GenerateQRCodes(string leftData, string rightData)
+//  {
+//     //create the canvas (384px is standard for 58mm thermal printers)
+//     using (var canvas = new Image<Rgba32>(384, 150))
+//     {
+//         canvas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.White));
 
-  public static byte[] GenerateQRCodes(string leftData, string rightData)
-  {
-    // 1. Create the canvas (384px is standard for 58mm thermal printers)
-    using (var canvas = new Image<Rgba32>(384, 150))
-    {
-        canvas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.White));
-
-       
-        DrawQRCode(canvas, leftData, 40, 10);
-        DrawQRCode(canvas, rightData, 210, 10);
-
-            // 3. Convert to ESC/POS bytes
-            return ImageToEscPos(canvas);
+//         DrawQRCode(canvas, leftData, 40, 10);
+//         DrawQRCode(canvas, rightData, 210, 10);
+//         return ImageToEscPos(canvas);
         
-        }
-  }
+//     }
+//   }
 
     private static void DrawQRCode(Image<Rgba32> canvas, string data, int x, int y)
     {
-    using (var qrGenerator = new QRCodeGenerator())
-    using (var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q))
-    {
-        // We use PngByteQRCode to get a format ImageSharp can easily load
-        var qrCode = new PngByteQRCode(qrCodeData);
-        byte[] qrBytes = qrCode.GetGraphic(4); // 4 pixels per module
-
-        using (var qrImage = SixLabors.ImageSharp.Image.Load<Rgba32>(qrBytes))
+        using (var qrGenerator = new QRCodeGenerator())
+        using (var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q))
         {
-            // Resize if necessary (e.g., to 130x130 to fit your 150 height)
-            qrImage.Mutate(img => img.Resize(130, 130));
+            // use PngByteQRCode to get a format ImageSharp can load
+            var qrCode = new PngByteQRCode(qrCodeData);
+            byte[] qrBytes = qrCode.GetGraphic(4); // 4 pixels per module
 
-                // Draw the QR onto the main canvas
+            using (var qrImage = SixLabors.ImageSharp.Image.Load<Rgba32>(qrBytes))
+            {
+                //resize to 130x130 to fit 150 height
+                qrImage.Mutate(img => img.Resize(130, 130));
+
+                //draw the QR onto the main canvas
                 canvas.Mutate(ctx => ctx.DrawImage(qrImage, new SixLabors.ImageSharp.Point(x, y), 1f));
 
                 qrImage.SaveAsPng("~/download");
+            }
         }
     }
-}
 
     public static void AddBarcode(List<byte> data, string invoiceText)
     {
@@ -216,81 +199,134 @@ public class BitmapRender
         data.AddRange(Encoding.ASCII.GetBytes(invoiceText));
     }
 
-    public static byte[] ConvertLogo(byte[] imageBytes)
+
+    public static byte[] PrintFullImage(string base64String)
     {
-        // 1. 使用 ImageSharp 載入圖片
-        using (Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(imageBytes))
+        byte[] bytes = Convert.FromBase64String(base64String);
+        using Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(bytes);
+
+        image.Mutate(x => x.Resize(new ResizeOptions
         {
-            // 2. 縮放至 384 像素寬度 (57mm 紙張標準)
-            int targetWidth = 384;
-            int targetHeight = (int)((double)image.Height * targetWidth / image.Width);
+            Size = new SixLabors.ImageSharp.Size(384, 0),
+            Mode = ResizeMode.Stretch
+        }).Grayscale());
 
-            // 使用高品質 Bicubic 縮放
-            image.Mutate(x => x.Resize(targetWidth, targetHeight, KnownResamplers.Bicubic));
 
-            // 3. 轉換為 ESC/POS 二進位位元流 (GS v 0 指令)
-            return ConvertToEscPos(image);
-        }
+        //binarythreshold 0.5f becomes bolder
+
+
+        //return TrueFullSize(image);
+        return TrueFullSize(image);
     }
 
-    private static byte[] ConvertToEscPos(Image<Rgba32> image)
+    public static byte[] TrueFullSize(Image<Rgba32> image)
     {
-        int width = image.Width;
-        int height = image.Height;
-        int widthBytes = (width + 7) / 8; // 每 8 個點組成一個 Byte
-        
-        List<byte> data = new List<byte>();
+        List<byte> result = new();
+        //GS W nL nH -> 576 is 0x0240. nL = 0x40, nH = 0x02
+        //80mm = 576px
+        result.AddRange(new byte[] { 0x1B, 0x40 }); // Reset
+        //result.AddRange(new byte[] { 0x1D, 0x57, 0xC0, 0x01 }); // Width 448
+        //result.AddRange(new byte[] { 0x1D, 0x57, 0x40, 0x02 }); //576
 
-        // ESC/POS 指令: GS v 0 m xL xH yL yH
-        // 這是熱感印表機列印點陣圖的標準指令
-        data.AddRange(new byte[] { 
-            0x1D, 0x76, 0x30, 0, 
-            (byte)(widthBytes % 256), (byte)(widthBytes / 256), 
-            (byte)(height % 256), (byte)(height / 256) 
-        });
+        result.AddRange(new byte[] { 0x1D, 0x4C, 0x00, 0x00 }); // Left Margin 0
+    
+        // Set Print Area Width to 384 (GS W nL nH)
+        // 384 = 0x0180 -> nL = 0x80, nH = 0x01
+        // This tells the printer: "Do not pad the sides, use all 384 dots."
+        result.AddRange(new byte[] { 0x1D, 0x57, 0x80, 0x01 });
+        // GS v 0 (Bit Image Command)
+        int widthBytes = 48; // 384 / 8
+        result.AddRange(new byte[] { 0x1D, 0x76, 0x30, 0x00 });
+        result.Add((byte)(widthBytes & 0xFF));    
+        result.Add((byte)(widthBytes >> 8));      
+        result.Add((byte)(image.Height & 0xFF));  
+        result.Add((byte)(image.Height >> 8));    
 
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < image.Height; y++)
         {
             for (int xByte = 0; xByte < widthBytes; xByte++)
             {
-                byte currentByte = 0;
+                byte b = 0;
                 for (int bit = 0; bit < 8; bit++)
                 {
-                    int xPixel = (xByte * 8) + bit;
-                    if (xPixel < width)
+                    if (image[xByte * 8 + bit, y].R < 128)
                     {
-                        // 取得像素
-                        var pixel = image[xPixel, y];
-                        
-                        // 計算亮度 (Luminance) 決定黑白
-                        // 這是標準的灰階公式: 0.299*R + 0.587*G + 0.114*B
-                        double gray = (0.299 * pixel.R) + (0.587 * pixel.G) + (0.114 * pixel.B);
-                        
-                        // 如果透明度太低或顏色夠深，就印出黑色 (1)
-                        if (pixel.A > 128 && gray < 128) 
-                        {
-                            currentByte |= (byte)(0x80 >> bit);
-                        }
+                        b |= (byte)(0x80 >> bit);
                     }
                 }
-                data.Add(currentByte);
+                result.Add(b);
             }
         }
-        return data.ToArray();
+
+        result.AddRange(new byte[] { 0x1B, 0x64, 0x02 });
+        return result.ToArray();
     }
-    
-    
+
 
     public static byte[] ParseRawHex(string hexInput)
     {
-    if (string.IsNullOrWhiteSpace(hexInput)) return Array.Empty<byte>();
+        if (string.IsNullOrWhiteSpace(hexInput)) return Array.Empty<byte>();
 
-   
-        // Clean up brackets, spaces, and "0x" prefixes
+        // clean up brackets, spaces, and "0x" prefixes
         var cleaned = hexInput.Replace("{", "").Replace("}", "").Replace("0x", "").Replace(" ", "");
         var hexParts = cleaned.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
         return hexParts.Select(s => Convert.ToByte(s.Trim(), 16)).ToArray();
+    }
+    
+    public static byte[] GetImageBinaryData(Image<Rgba32> image)
+    {
+        using var ms = new MemoryStream();
+        using var bw = new BinaryWriter(ms);
+
+        // ESC @ - Initialize printer
+        bw.Write(new byte[] { 0x1B, 0x40 });
+
+        // Line Spacing to 0
+        bw.Write(new byte[] { 0x1B, 0x33, 0x00 });
+
+        int width = image.Width;
+
+        var a = "";
+        int height = image.Height;
+        int byteWidth = (width + 7) / 8; // 因為 1 個位元組（byte）包含 8 個位元，所以寬度必須除以 8。(width + 7) / 8 是為了確保如果寬度不是 8 的倍數，也能補足空間
+
+        // GS v 0 - Print Raster Bit Image Command
+        // Format: GS v 0 m xL xH yL yH d1...dk
+        bw.Write(new byte[] { 0x1D, 0x76, 0x30, 0x00 }); // 0x1D 進階功能 0x76 列印 0x30 使用GSv0 0x00 一般模式
+        
+        bw.Write((byte)(byteWidth % 256)); // xL
+        bw.Write((byte)(byteWidth / 256)); // xH
+        bw.Write((byte)(height % 256));    // yL
+        bw.Write((byte)(height / 256));    // yH
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < byteWidth; x++)
+            {
+                byte b = 0;
+                for (int bit = 0; bit < 8; bit++)
+                {
+                    int xPos = (x * 8) + bit;
+                    if (xPos < width)
+                    {
+                        var pixel = image[xPos, y];
+                        // If the pixel is "dark" (Black), set the corresponding bit to 1
+                        if (pixel.R < 128) 
+                        {
+                            b |= (byte)(0x80 >> bit);
+                        }
+                    }
+                }
+                bw.Write(b);
+            }
+        }
+
+        // Paper Feed (3 lines) and Cut
+        //bw.Write(new byte[] { 0x1B, 0x64, 0x03 }); // Feed 3 lines
+        //bw.Write(new byte[] { 0x1D, 0x56, 0x42, 0x00 }); // Partial cut
+
+        return ms.ToArray();
     }
 
 }

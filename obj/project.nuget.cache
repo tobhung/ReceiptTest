@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "rhqJsQ6/sl0=",
+  "dgSpecHash": "iQ+gNHxAOjY=",
   "success": true,
   "projectFilePath": "C:\\Users\\User\\Desktop\\ReceiptTest\\ReceiptTest.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\User\\.nuget\\packages\\esc-pos-usb-net\\1.1.3\\esc-pos-usb-net.1.1.3.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\escpos_net\\3.0.0\\escpos_net.3.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.22\\microsoft.aspnetcore.openapi.8.0.22.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
@@ -22,9 +23,7 @@
     "C:\\Users\\User\\.nuget\\packages\\runtime.native.system.io.ports\\6.0.0\\runtime.native.system.io.ports.6.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\runtime.osx-arm64.runtime.native.system.io.ports\\6.0.0\\runtime.osx-arm64.runtime.native.system.io.ports.6.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\runtime.osx-x64.runtime.native.system.io.ports\\6.0.0\\runtime.osx-x64.runtime.native.system.io.ports.6.0.0.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\sixlabors.fonts\\2.1.3\\sixlabors.fonts.2.1.3.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\sixlabors.imagesharp\\3.1.12\\sixlabors.imagesharp.3.1.12.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\sixlabors.imagesharp.drawing\\2.1.7\\sixlabors.imagesharp.drawing.2.1.7.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\sixlabors.imagesharp\\2.1.12\\sixlabors.imagesharp.2.1.12.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\supersimpletcp\\2.4.0\\supersimpletcp.2.4.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\swashbuckle.aspnetcore\\6.6.2\\swashbuckle.aspnetcore.6.6.2.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.6.2\\swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
@@ -36,10 +35,7 @@
     "C:\\Users\\User\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.text.encoding.codepages\\10.0.2\\system.text.encoding.codepages.10.0.2.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\system.text.encodings.web\\6.0.0\\system.text.encodings.web.6.0.0.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\system.text.json\\6.0.4\\system.text.json.6.0.4.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.netcore.app.runtime.linux-arm64\\8.0.22\\microsoft.netcore.app.runtime.linux-arm64.8.0.22.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.linux-arm64\\8.0.22\\microsoft.aspnetcore.app.runtime.linux-arm64.8.0.22.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.netcore.app.host.linux-arm64\\8.0.22\\microsoft.netcore.app.host.linux-arm64.8.0.22.nupkg.sha512"
+    "C:\\Users\\User\\.nuget\\packages\\system.text.json\\6.0.4\\system.text.json.6.0.4.nupkg.sha512"
   ],
   "logs": []
 }
