@@ -15,10 +15,13 @@ RUN dotnet publish -c Release -o /out -r linux-arm64 --self-contained false
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim-arm64v8
 WORKDIR /app
 
-# 優先安裝系統工具 (這層會被快取，除非你修改了這幾行)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cups-client && \
     rm -rf /var/lib/apt/lists/*
+
+EXPOSE 631 
+
+CMD ["cupsd", "-f"]
 
 # 複製編譯好的程式碼 (放在安裝工具之後)
 COPY --from=build /out .

@@ -3,9 +3,8 @@ services:
     container_name: receipt-print-app
     image: ghcr.io/tobhung/receipttest:latest
     user: "root"
-    privileged: true # 加上這個，給予容器存取硬體與系統通訊的權限
-    devices:
-      - /dev/usb/lp0:/dev/usb/lp0
+    environment:
+      - CUPS_SERVER=/var/run/cups/cups.sock # 告訴 lp 指令去哪裡找主機的服務
     volumes:
       - /var/run/cups/cups.sock:/var/run/cups/cups.sock
       - /var/run/dbus:/var/run/dbus
