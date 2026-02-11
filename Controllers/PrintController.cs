@@ -224,13 +224,13 @@ namespace ReceiptTest.Controllers
 
 
             var tempFile = Path.GetTempFileName();
-            await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
 
             var process = new Process();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
 
+                await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
 
                 process.StartInfo = new ProcessStartInfo
                 {
@@ -241,12 +241,11 @@ namespace ReceiptTest.Controllers
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-                
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
 
-                
+                //System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
                 process.StartInfo = new ProcessStartInfo
                 {
                     FileName = "/usr/bin/lp",
@@ -258,7 +257,11 @@ namespace ReceiptTest.Controllers
             }
 
         
-            
+            process.Start();
+            await process.WaitForExitAsync();
+
+            //刪除暫存
+            System.IO.File.Delete(tempFile);
 
             if (process.ExitCode == 0)
             {
