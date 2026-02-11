@@ -43,6 +43,5 @@ jobs:
         with:
           context: .
           push: true
-          # 這裡加一個小技巧：將名稱轉為小寫，避免 GitHub Repo 大寫字母導致的錯誤
-          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/receipttest:latest
+          tags: ghcr.io/tobhung/receipttest:latest
           platforms: linux/arm64

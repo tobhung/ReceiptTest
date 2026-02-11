@@ -1,14 +1,14 @@
 services:
   web-api:
-    container_name: receipt-print-app 
+    container_name: receipt-print-app
     image: ghcr.io/tobhung/receipttest:latest
-    ports:
-      - "8080:80"
-    restart: always
-    # --- 將列印權限給 App ---
     user: "root"
+    privileged: true # 加上這個，給予容器存取硬體與系統通訊的權限
+    devices:
+      - /dev/usb/lp0:/dev/usb/lp0
     volumes:
       - /var/run/cups/cups.sock:/var/run/cups/cups.sock
+      - /var/run/dbus:/var/run/dbus
     # -----------------------------
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
@@ -19,6 +19,6 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      # 注意：請確認你的使用者路徑是 /home/pi 還是 /home/admin
+      - /var/run/cups/cups.sock
       - /home/admin/.docker/config.json:/config.json
     command: --interval 300 --cleanup --label-enable

@@ -225,12 +225,13 @@ namespace ReceiptTest.Controllers
 
             var tempFile = Path.GetTempFileName();
 
-            await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
-
             var process = new Process();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+
+                await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
+
                 process.StartInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
@@ -240,50 +241,42 @@ namespace ReceiptTest.Controllers
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                process.StartInfo = new ProcessStartInfo
+
+                process.Start();
+                await process.WaitForExitAsync();
+
+                //刪除暫存
+                System.IO.File.Delete(tempFile);
+
+                if (process.ExitCode == 0)
                 {
-                    FileName = "/usr/bin/lp",
-                    Arguments = $"-d Q3X -o raw {tempFile}",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                };
-            }
-
-        
-            process.Start();
-            await process.WaitForExitAsync();
-
-            //刪除暫存
-            System.IO.File.Delete(tempFile);
-
-            if (process.ExitCode == 0)
-            {
-                return Ok(new { message = "Test print sent successfully" });
-
-            }
-            else
-            {
-
-                var error = await process.StandardError.ReadToEndAsync();
-                var msg = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-                var msg2 = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                return BadRequest(new { error, message = msg2});
+                    return Ok(new { message = "Test print sent successfully" });
 
                 }
                 else
                 {
-                return BadRequest(new { error, message = msg});
-                    
+
+                    var error = await process.StandardError.ReadToEndAsync();
+
+                    return BadRequest(new { error });
                 }
-                return BadRequest(new { error});
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+
+                System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
+                // process.StartInfo = new ProcessStartInfo
+                // {
+                //     FileName = "/usr/bin/lp",
+                //     Arguments = $"-d Q3X -o raw {tempFile}",
+                //     RedirectStandardOutput = true,
+                //     RedirectStandardError = true,
+                //     UseShellExecute = false,
+                // };
+                return Ok(new { message = "Test print sent successfully" });
+            }
+
+            return Ok();
         }
         
         
