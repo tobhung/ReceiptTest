@@ -224,13 +224,13 @@ namespace ReceiptTest.Controllers
 
 
             var tempFile = Path.GetTempFileName();
+            await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
 
             var process = new Process();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
 
-                await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
 
                 process.StartInfo = new ProcessStartInfo
                 {
@@ -241,42 +241,37 @@ namespace ReceiptTest.Controllers
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-
-                process.Start();
-                await process.WaitForExitAsync();
-
-                //刪除暫存
-                System.IO.File.Delete(tempFile);
-
-                if (process.ExitCode == 0)
-                {
-                    return Ok(new { message = "Test print sent successfully" });
-
-                }
-                else
-                {
-
-                    var error = await process.StandardError.ReadToEndAsync();
-
-                    return BadRequest(new { error });
-                }
+                
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
 
-                System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
-                // process.StartInfo = new ProcessStartInfo
-                // {
-                //     FileName = "/usr/bin/lp",
-                //     Arguments = $"-d Q3X -o raw {tempFile}",
-                //     RedirectStandardOutput = true,
-                //     RedirectStandardError = true,
-                //     UseShellExecute = false,
-                // };
-                return Ok(new { message = "Test print sent successfully" });
+                
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/usr/bin/lp",
+                    Arguments = $"-d Q3X -o raw {tempFile}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                };
             }
 
-            return Ok();
+        
+            
+
+            if (process.ExitCode == 0)
+            {
+                return Ok(new { message = "Test print sent successfully" });
+
+            }
+            else
+            {
+
+                var error = await process.StandardError.ReadToEndAsync();
+
+                return BadRequest(new { error});
+            }
         }
         
         

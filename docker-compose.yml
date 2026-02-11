@@ -15,7 +15,7 @@ services:
 
   watchtower:
     image: containrrr/watchtower
-    container_name: watchtower # 建議加上名字，方便你下 logs 指令
+    container_name: watchtower 
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
