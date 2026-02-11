@@ -2,22 +2,25 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
+# 利用快取優化：先還原套件
 COPY *.sln .
 COPY *.csproj .
 RUN dotnet restore
 
+# 複製原始碼並發佈
 COPY . .
 RUN dotnet publish -c Release -o /out -r linux-arm64 --self-contained false
 
 # 2. 執行階段
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim-arm64v8
 WORKDIR /app
-COPY --from=build /out .
 
+# 優先安裝系統工具 (這層會被快取，除非你修改了這幾行)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cups-client && \
     rm -rf /var/lib/apt/lists/*
 
+# 複製編譯好的程式碼 (放在安裝工具之後)
 COPY --from=build /out .
 
 # 告訴 Watchtower：請自動更新這個容器
