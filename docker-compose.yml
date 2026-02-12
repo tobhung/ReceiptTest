@@ -25,6 +25,8 @@ services:
     #   - CUPS_SERVER=cups 
     # volumes:
     #   - /var/run/cups:/var/run/cups
+    volumes:
+      - /dev/usb:/dev/usb
     devices:
       - "/dev/usb/lp0:/dev/usb/lp0"
     labels:
