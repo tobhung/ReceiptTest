@@ -21,14 +21,16 @@ services:
     image: ghcr.io/tobhung/receipttest:latest
     user: "root"
     privileged: true
-    environment:
-      - CUPS_SERVER=cups 
-    volumes:
-      - /var/run/cups:/var/run/cups
+    # environment:
+    #   - CUPS_SERVER=cups 
+    # volumes:
+    #   - /var/run/cups:/var/run/cups
+    devices:
+      - "/dev/usb/lp0:/dev/usb/lp0"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-    depends_on:
-      - cups
+    # depends_on:
+    #   - cups
 
   watchtower:
     # 修正：改用 1.5.3 版本避免 "client version 1.25 is too old" 錯誤

@@ -248,8 +248,10 @@ namespace ReceiptTest.Controllers
                 //System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
                 process.StartInfo = new ProcessStartInfo
                 {
-                    FileName = "/usr/bin/lp",
-                    Arguments = $"-d Q3X -o raw {tempFile}",
+                    //FileName = "/usr/bin/lp",
+                    FileName = "/bin/sh",
+                    //Arguments = $"-d Q3X -o raw {tempFile}",
+                    Arguments = $"-c \"cat {tempFile} > /dev/usb/lp0\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
