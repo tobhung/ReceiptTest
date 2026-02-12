@@ -5,6 +5,8 @@ services:
     privileged: true
     ports:
       - "631:631"
+    environment:
+      - CUPS_SERVER_ADMIN_ALLOW=all
     volumes:
       - /dev/bus/usb:/dev/bus/usb
       - /var/run/dbus:/var/run/dbus
