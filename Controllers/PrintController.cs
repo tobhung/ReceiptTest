@@ -184,9 +184,9 @@ namespace ReceiptTest.Controllers
         public async Task<IActionResult> PrintRawReceipt([FromBody] Req req)
         {
             var bytes = new List<byte>();
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            var encoding = Encoding.GetEncoding("BIG5");
+            bool isSuccess = false;
+            var errMsg = "";
 
             int paperWidth = 384;
 
@@ -207,96 +207,89 @@ namespace ReceiptTest.Controllers
             }).Grayscale());
 
 
-            //var ms = new MemoryStream();
-            //image.SaveAsBmp(ms);
-            //byte[] imgBytes = ms.ToArray();
-
-
             var imgarr = BitmapRender.GetImageBinaryData(image);
 
             bytes.AddRange(imgarr);
 
-            //var e = new EPSON();
-            // byte[] bytes = ByteSplicer.Combine(
-            // e.CenterAlign(),
-            // e.PrintImage(imageBytes, false, true, -1, 0)
-            // );
-
-
             var tempFile = Path.GetTempFileName();
 
-            var process = new Process();
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            try
             {
-
-                await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
-
-                process.StartInfo = new ProcessStartInfo
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c copy /b \"{tempFile}\" \"\\\\DESKTOP-F6LR2M9\\Printer\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
 
-                process.Start();
-                await process.WaitForExitAsync();
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
+                    var process = new Process();
+                    await System.IO.File.WriteAllBytesAsync(tempFile, bytes.ToArray());
 
-                //System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
-                // process.StartInfo = new ProcessStartInfo
-                // {
-                //     //FileName = "/usr/bin/lp",
-                //     FileName = "/bin/sh",
-                //     //Arguments = $"-d Q3X -o raw {tempFile}",
-                //     Arguments = $"-c \"cat {tempFile} > /dev/usb/lp0\"",
-                //     RedirectStandardOutput = true,
-                //     RedirectStandardError = true,
-                //     UseShellExecute = false,
-                // };
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c copy /b \"{tempFile}\" \"\\\\DESKTOP-F6LR2M9\\Printer\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
 
-                using (var client = new System.Net.Sockets.TcpClient("192.168.88.101", 9100))
-                using (var stream = client.GetStream())
-                {
-                    stream.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
-            
-                // 建議在最後補一個換行符或切刀指令，確保印表機動作
-                // byte[] cutCommand = new byte[] { 0x1D, 0x56, 0x42, 0x00 }; // ESC/POS 切刀範例
-                // stream.Write(cutCommand, 0, cutCommand.Length);
-            
-                stream.Flush();
+                    process.Start();
+                    await process.WaitForExitAsync();
+
+                    isSuccess = process.ExitCode == 0;
+                    if (!isSuccess) errMsg = await process.StandardError.ReadToEndAsync();
+
+                    //刪除暫存
+                    System.IO.File.Delete(tempFile);
+
                 }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
 
+                    //1.測試直接寫入本地機器印出來 不行
+                    //System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
+
+                    //2.用process 但在docker環境下無法抓到印表機
+                    // process.StartInfo = new ProcessStartInfo
+                    // {
+                    //     //FileName = "/usr/bin/lp",
+                    //     FileName = "/bin/sh",
+                    //     //Arguments = $"-d Q3X -o raw {tempFile}",
+                    //     Arguments = $"-c \"cat {tempFile} > /dev/usb/lp0\"",
+                    //     RedirectStandardOutput = true,
+                    //     RedirectStandardError = true,
+                    //     UseShellExecute = false,
+                    // };
+
+                    //3. 用socat 直接給本地印表機port號 用socket連線
+                    using (var client = new System.Net.Sockets.TcpClient("192.168.88.101", 9100))
+                    using (var stream = client.GetStream())
+                    {
+                        await stream.WriteAsync(bytes.ToArray(), 0, bytes.ToArray().Length);
+
+                        await stream.FlushAsync();
+                    }
+
+                    isSuccess = true;
+
+                }
+            }
+            catch( Exception e)
+            {
+                isSuccess = false;
+                errMsg = e.Message;
             }
 
-        
-            // process.Start();
-            // await process.WaitForExitAsync();
-
-            //刪除暫存
-            System.IO.File.Delete(tempFile);
-
-            if (process.ExitCode == 0)
+            if (isSuccess)
             {
                 return Ok(new { message = "Test print sent successfully" });
-
             }
             else
             {
-
-                var error = await process.StandardError.ReadToEndAsync();
-
-                return BadRequest(new { error});
+                return BadRequest(new { isSuccess, errMsg });
             }
+        
         }
         
-        
-
+    
         // [HttpPost("receipt")]
         // public async Task<IActionResult> PrintReceipt([FromBody] StoreRequest model)
         // {
