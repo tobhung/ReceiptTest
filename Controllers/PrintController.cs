@@ -241,26 +241,42 @@ namespace ReceiptTest.Controllers
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
+
+                process.Start();
+                await process.WaitForExitAsync();
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
 
                 //System.IO.File.WriteAllBytes("/dev/usb/lp0", bytes.ToArray());
-                process.StartInfo = new ProcessStartInfo
+                // process.StartInfo = new ProcessStartInfo
+                // {
+                //     //FileName = "/usr/bin/lp",
+                //     FileName = "/bin/sh",
+                //     //Arguments = $"-d Q3X -o raw {tempFile}",
+                //     Arguments = $"-c \"cat {tempFile} > /dev/usb/lp0\"",
+                //     RedirectStandardOutput = true,
+                //     RedirectStandardError = true,
+                //     UseShellExecute = false,
+                // };
+
+                using (var client = new System.Net.Sockets.TcpClient("192.168.88.101", 9100))
+                using (var stream = client.GetStream())
                 {
-                    //FileName = "/usr/bin/lp",
-                    FileName = "/bin/sh",
-                    //Arguments = $"-d Q3X -o raw {tempFile}",
-                    Arguments = $"-c \"cat {tempFile} > /dev/usb/lp0\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                };
+                    stream.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
+            
+                // 建議在最後補一個換行符或切刀指令，確保印表機動作
+                // byte[] cutCommand = new byte[] { 0x1D, 0x56, 0x42, 0x00 }; // ESC/POS 切刀範例
+                // stream.Write(cutCommand, 0, cutCommand.Length);
+            
+                stream.Flush();
+                }
+
             }
 
         
-            process.Start();
-            await process.WaitForExitAsync();
+            // process.Start();
+            // await process.WaitForExitAsync();
 
             //刪除暫存
             System.IO.File.Delete(tempFile);
